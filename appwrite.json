@@ -1,0 +1,21 @@
+{
+    "projectId": "Circles",
+    "projectName": "Circles",
+    "functions": [
+        {
+            "$id": "add_friend",
+            "name": "add_friend",
+            "runtime": "dart-2.17",
+            "path": "functions/add_friend",
+            "entrypoint": "lib/main.dart",
+            "ignore": [
+                ".packages",
+                ".dart_tool"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
+    ]
+}
