@@ -1,3 +1,12 @@
+# Tipps
+when env got changed run
+'docker compose up -d' or 'docker compose up -d --build --force-recreate'
+
+To connect to it in Flutter you need to set the endpoint as
+'https://8080-appwrite-integrationfor-52tyj68ojp0.ws-eu77.gitpod.io/v1'
+the 'https' is realy important especially the 's' at the end and the server sometimes changes so you need to adjust the ws-eu77 with the new server of GitPod
+
+
 # An Appwrite template on Gitpod
 
 This is a [Appwrite](https://appwrite.io/) template configured for ephemeral development environments on [Gitpod](https://www.gitpod.io/).
