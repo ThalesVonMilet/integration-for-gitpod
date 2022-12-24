@@ -1,4 +1,5 @@
 import 'package:dart_appwrite/dart_appwrite.dart';
+import 'dart:async';
 
 /*
   'req' variable has:
@@ -9,7 +10,7 @@ import 'package:dart_appwrite/dart_appwrite.dart';
   'res' variable has:
     'send(text, status: status)' - function to return text response. Status code defaults to 200
     'json(obj, status: status)' - function to return JSON response. Status code defaults to 200
-  
+
   If an error is thrown, a response with code 500 will be returned.
 */
 
@@ -38,26 +39,29 @@ Future<void> start(final req, final res) async {
         .setKey(req.variables['APPWRITE_FUNCTION_API_KEY'])
         .setSelfSigned(status: true);
 
-        Map<String,dynamic> friendRequest = await database.createDocument(
-          databaseId: req.variables['APPWRITE_DATABASE_ID'],
-          collectionId:  req.variables['APPWRITE_COLLECTION_ID'],
-          documentId: req.payload[req.variables['APPWRITE_MAP_NAME_SENDER']],
-          data: {
-            req.variables['APPWRITE_MAP_NAME_NAME'] : payload[req.variables['APPWRITE_MAP_NAME_NAME']],
-            req.variables['APPWRITE_MAP_NAME_USERNAME'] : payload[req.variables['APPWRITE_MAP_NAME_USERNAME']],
-            req.variables['APPWRITE_MAP_NAME_SENDER'] : payload[req.variables['APPWRITE_MAP_NAME_SENDER']],
-            req.variables['APPWRITE_MAP_NAME_RECEIVER'] : payload[req.variables['APPWRITE_MAP_NAME_RECEIVER']]
-          },
-          permissions:[
-            Permission.read(Role.user(payload[req.variables['APPWRITE_MAP_NAME_SENDER']])),
-            Permission.write(Role.user(payload[req.variables['APPWRITE_MAP_NAME_SENDER']])),
-            Permission.delete(Role.user(payload[req.variables['APPWRITE_MAP_NAME_SENDER']])), 
-            Permission.read(Role.user(payload[req.variables['APPWRITE_MAP_NAME_RECEIVER']])),
-            Permission.write(Role.user(payload[req.variables['APPWRITE_MAP_NAME_RECEIVER']])),
-            Permission.delete(Role.user(payload[req.variables['APPWRITE_MAP_NAME_RECEIVER']])),
-          ]
+    await database.createDocument(
+        databaseId: req.variables['APPWRITE_DATABASE_ID'],
+        collectionId:  req.variables['APPWRITE_COLLECTION_ID'],
+        documentId: req.payload[req.variables['APPWRITE_MAP_NAME_SENDER']],
+        data: {
+          req.variables['APPWRITE_MAP_NAME_NAME'] : req.payload[req.variables['APPWRITE_MAP_NAME_NAME']],
+          req.variables['APPWRITE_MAP_NAME_USERNAME'] : req.payload[req.variables['APPWRITE_MAP_NAME_USERNAME']],
+          req.variables['APPWRITE_MAP_NAME_SENDER'] : req.payload[req.variables['APPWRITE_MAP_NAME_SENDER']],
+          req.variables['APPWRITE_MAP_NAME_RECEIVER'] : req.payload[req.variables['APPWRITE_MAP_NAME_RECEIVER']]
+        },
+        permissions:[
+          Permission.read(Role.user(req.payload[req.variables['APPWRITE_MAP_NAME_SENDER']])),
+          Permission.write(Role.user(req.payload[req.variables['APPWRITE_MAP_NAME_SENDER']])),
+          Permission.delete(Role.user(req.payload[req.variables['APPWRITE_MAP_NAME_SENDER']])),
+          Permission.read(Role.user(req.payload[req.variables['APPWRITE_MAP_NAME_RECEIVER']])),
+          Permission.write(Role.user(req.payload[req.variables['APPWRITE_MAP_NAME_RECEIVER']])),
+          Permission.delete(Role.user(req.payload[req.variables['APPWRITE_MAP_NAME_RECEIVER']])),
+        ]
     );
   }
 
   res.send('Friendrequest got sent', status: 400);
 }
+
+
+
