@@ -1,4 +1,21 @@
 {
     "projectId": "638922ef2d9a964b045e",
-    "projectName": "Circles Beta"
+    "projectName": "Circles Beta",
+    "functions": [
+        {
+            "$id": "add_a_friend",
+            "name": "My Awesome Function",
+            "runtime": "dart-2.17",
+            "path": "functions/My Awesome Function",
+            "entrypoint": "lib/main.dart",
+            "ignore": [
+                ".packages",
+                ".dart_tool"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
+    ]
 }
