@@ -46,6 +46,21 @@
             "events": [],
             "schedule": "",
             "timeout": 15
+        },
+        {
+            "$id": "63b8a8b413b7b5b25bad",
+            "name": "Get friend suggestions from contacts",
+            "runtime": "dart-2.17",
+            "path": "functions/Get friend suggestions from contacts",
+            "entrypoint": "lib/main.dart",
+            "ignore": [
+                ".packages",
+                ".dart_tool"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
         }
     ]
 }

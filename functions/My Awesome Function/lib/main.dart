@@ -15,40 +15,29 @@ import 'dart:convert';
   If an error is thrown, a response with code 500 will be returned.
 
   test payload:
-  {
-   name: "hello",
-    username:"world",
-    receiver:"new",
-    sender:"old"
-  }
 
   {
-   "name": "hello",
-    "username":"world",
+    "receiverName": "hello",
+    "receiverUsername":"world",
+    "senderName": "hello",
+    "senderUsername":"world",
     "receiver":"new",
     "sender":"old"
   }
+
 */
 
 Future<void> start(final req, final res) async {
   final client = Client();
-
-  // Uncomment the services you need, delete the ones you don't
-  // final account = Account(client);
-  // final avatars = Avatars(client);
   final database = Databases(client);
-  // final functions = Functions(client);
-  // final health = Health(client);
-  // final locale = Locale(client);
-  // final storage = Storage(client);
-  // final teams = Teams(client);
-  // final users = Users(client);
 
   if (req.variables['APPWRITE_FUNCTION_ENDPOINT'] == null ||
       req.variables['APPWRITE_FUNCTION_API_KEY'] == null) {
+        print('Endpoint or function API Key are missing');
     res.send('Endpoint or function API Key are missing', status: 404);
     return;
   } else {
+     print('before client');
     client
         .setEndpoint(req.variables['APPWRITE_FUNCTION_ENDPOINT'])
         .setProject(req.variables['APPWRITE_FUNCTION_PROJECT_ID'])
@@ -60,6 +49,7 @@ Future<void> start(final req, final res) async {
       payload = json.decode(req.payload);
       print('Payload: ${req.payload}');
     } catch (error) {
+      print('Payload: ${error}');
       res.send('AppwriteFunctionError : $error',status: 404);
       return;
     }
@@ -69,25 +59,25 @@ Future<void> start(final req, final res) async {
         collectionId:  req.variables['APPWRITE_COLLECTION_ID'],
         documentId: 'unique()',
         data: {
-          req.variables['APPWRITE_MAP_NAME_NAME'] : payload[req.variables['APPWRITE_MAP_NAME_NAME']],
-          req.variables['APPWRITE_MAP_NAME_USERNAME'] : payload[req.variables['APPWRITE_MAP_NAME_USERNAME']],
+          req.variables['APPWRITE_MAP_NAME_RECEIVER_NAME'] : payload[req.variables['APPWRITE_MAP_NAME_RECEIVER_NAME']],
+          req.variables['APPWRITE_MAP_NAME_RECEIVER_USERNAME'] : payload[req.variables['APPWRITE_MAP_NAME_RECEIVER_USERNAME']], 
+          req.variables['APPWRITE_MAP_NAME_RECEIVER'] : payload[req.variables['APPWRITE_MAP_NAME_RECEIVER']],
+          req.variables['APPWRITE_MAP_NAME_SENDER_NAME'] : payload[req.variables['APPWRITE_MAP_NAME_SENDER_NAME']],
+          req.variables['APPWRITE_MAP_NAME_SENDER_USERNAME'] : payload[req.variables['APPWRITE_MAP_NAME_SENDER_USERNAME']],
           req.variables['APPWRITE_MAP_NAME_SENDER'] : payload[req.variables['APPWRITE_MAP_NAME_SENDER']],
-          req.variables['APPWRITE_MAP_NAME_RECEIVER'] : payload[req.variables['APPWRITE_MAP_NAME_RECEIVER']]
         },
         permissions:[
           Permission.read(Role.user(payload[req.variables['APPWRITE_MAP_NAME_SENDER']])),
           Permission.write(Role.user(payload[req.variables['APPWRITE_MAP_NAME_SENDER']])),
-          //Permission.delete(Role.user(payload[req.variables['APPWRITE_MAP_NAME_SENDER']])),
           Permission.read(Role.user(payload[req.variables['APPWRITE_MAP_NAME_RECEIVER']])),
           Permission.write(Role.user(payload[req.variables['APPWRITE_MAP_NAME_RECEIVER']])),
-          //Permission.delete(Role.user(payload[req.variables['APPWRITE_MAP_NAME_RECEIVER']])),
         ]
     ).then((document) {
+      print(document.data);
       res.json(document.data);
     },onError: (error){
       res.send('AppwriteFunctionError : $error',status: 404);
     });
   }
-
 }
 

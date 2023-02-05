@@ -42,6 +42,7 @@ Future<void> start(final req, final res) async {
 
   final String userMapNameName;
   final String userMapNameUsername;
+  final String userMapNameUid;
 
   final String searchRequestMapNameSender;
   final String searchRequestMapNameSearchNameOrUsername;
@@ -59,11 +60,12 @@ Future<void> start(final req, final res) async {
 
     userMapNameName = req.variables['APPWRITE_MAP_NAME_USER_NAME'];
     userMapNameUsername = req.variables['APPWRITE_MAP_NAME_USER_USERNAME'];
+    userMapNameUid = req.variables['APPWRITE_MAP_NAME_USER_UID'];
 
     searchRequestMapNameSender =
-        req.variables['APPWRITE_MAP_NAME_SEARCH_REQUEST_SENDER'];
+    req.variables['APPWRITE_MAP_NAME_SEARCH_REQUEST_SENDER'];
     searchRequestMapNameSearchNameOrUsername =
-        req.variables['APPWRITE_MAP_NAME_SEARCH_REQUEST_NAME_OR_USERNAME'];
+    req.variables['APPWRITE_MAP_NAME_SEARCH_REQUEST_NAME_OR_USERNAME'];
 
   } catch (error) {
     res.send('Variables: $error', status: 100);
@@ -106,18 +108,19 @@ Future<void> start(final req, final res) async {
         Query.search('name', input),
         //Query.search('username', input)
       ]).then((documents) async {
-        documents.documents.forEach((document) {
-          print(document.data);
-          if(document.$id != sender){
-            results.add({
-              userMapNameName : document.data[userMapNameName],
-              userMapNameUsername: document.data[userMapNameUsername]
-            });
-          }
+    documents.documents.forEach((document) {
+      print(document.data);
+      if(document.$id != sender){
+        results.add({
+          userMapNameName : document.data[userMapNameName],
+          userMapNameUsername : document.data[userMapNameUsername],
+          userMapNameUid : document.$id
         });
-        return;
+      }
+    });
+    return;
   }, onError: (error) async {    print(error);
-});
+  });
   await database.listDocuments(
       databaseId: usersDatabaseId,
       collectionId:usersCollectionId,
@@ -125,37 +128,47 @@ Future<void> start(final req, final res) async {
         //Query.search('name', input),
         Query.search('username', input),
       ]).then((documents) async {
-         print(documents.toMap);
+    print(documents.toMap);
     documents.documents.forEach((document) {
       print(document.data);
       if(document.$id != sender){
-        results.add({
+         
+        Map<String,dynamic> friendSuggestion = {
           userMapNameName : document.data[userMapNameName],
-          userMapNameUsername : document.data[userMapNameUsername]
-        });
+          userMapNameUsername : document.data[userMapNameUsername],
+          userMapNameUid : document.$id
+        };
+
+        bool contains = results.toString().contains(friendSuggestion.toString());
+        if(contains == false){
+          results.add(friendSuggestion);
+        }
+      
       }
     });
     return;
   }, onError: (error) async {    print(error);
-});
+  });
 
 
   //TODO 1 put people in vicinity on top
 
 
-try{
-  List<String> te = [];
-  print(results);
-  results.toList().forEach((ts){
-    te.add(json.encode(ts));
-  });
-  res.json({'data': te});
-  return;
-}catch(error){
-  res.send(error.toString());
-  return;
+  try{
+    res.json({'data': results.toList()});
+    return;
+  }catch(error){
+    res.send(error.toString());
+    return;
+  }
+
 }
 
-  res.send('error');
-  return ;
+class FriendSuggestion {
+  late final String uid;
+  late final String name;
+  late final String username;
+  late final String? profilePicture;
+
+  FriendSuggestion({required this.uid, required this.name, required this.username, this.profilePicture});
 }
